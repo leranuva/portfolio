@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8B5CF6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Fondo circular con gradiente -->
+  <circle cx="50" cy="50" r="48" fill="url(#gradient)"/>
+  
+  <!-- Letra R estilizada y mejorada -->
+  <g transform="translate(50, 50)">
+    <!-- Línea vertical izquierda -->
+    <line x1="-18" y1="-22" x2="-18" y2="22" 
+          stroke="white" 
+          stroke-width="7" 
+          stroke-linecap="round"/>
+    
+    <!-- Parte superior horizontal -->
+    <line x1="-18" y1="-22" x2="8" y2="-22" 
+          stroke="white" 
+          stroke-width="7" 
+          stroke-linecap="round"/>
+    
+    <!-- Curva superior derecha -->
+    <path d="M 8 -22 Q 18 -22 18 -12 Q 18 -2 8 -2" 
+          stroke="white" 
+          stroke-width="7" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" 
+          fill="none"/>
+    
+    <!-- Línea horizontal media -->
+    <line x1="-18" y1="-2" x2="8" y2="-2" 
+          stroke="white" 
+          stroke-width="7" 
+          stroke-linecap="round"/>
+    
+    <!-- Pierna diagonal -->
+    <line x1="8" y1="-2" x2="18" y2="22" 
+          stroke="white" 
+          stroke-width="7" 
+          stroke-linecap="round"/>
+  </g>
+</svg>
+
