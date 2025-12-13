@@ -1,6 +1,6 @@
 # Portfolio Personal - Ramiro Núñez Valverde
 
-Portfolio profesional desarrollado con **Laravel 12** y **Tailwind CSS**, con diseño moderno, responsivo y modo oscuro.
+Portfolio profesional desarrollado con **Laravel 12**, **Tailwind CSS** y **Alpine.js**. Sistema completo con diseño moderno, responsivo, modo oscuro, gestión de proyectos destacados, habilidades por categorías y sección de contacto integrada.
 
 ## 🚀 Características
 
