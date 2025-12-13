@@ -196,7 +196,7 @@ Este proyecto es de código abierto y está disponible bajo la licencia MIT.
 **Ramiro Núñez Valverde** - Full-Stack Web Developer
 
 * GitHub: [@leranuva](https://github.com/leranuva)
-* Portfolio: [leranuva.com](https://leranuva.com)
+* Portfolio: [ramironuva.com](https://ramironuva.com)
 
 ## 🚀 Próximas Mejoras
 
@@ -208,4 +208,4 @@ Este proyecto es de código abierto y está disponible bajo la licencia MIT.
 
 ---
 
-_Desarrollado con ❤️ usando Laravel, Tailwind CSS y Alpine.js_
+_Desarrollado usando Laravel, Tailwind CSS y Alpine.js_
