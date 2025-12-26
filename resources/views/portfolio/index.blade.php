@@ -6,11 +6,46 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $config->name ?? 'Portfolio' }} - {{ $config->role ?? 'Developer' }}</title>
+    
+    <!-- Primary Meta Tags -->
+    <title>{{ $config->name ?? 'Portfolio' }} - {{ $config->role ?? 'Full-Stack Web Developer' }}</title>
+    <meta name="title" content="{{ $config->name ?? 'Portfolio' }} - {{ $config->role ?? 'Full-Stack Web Developer' }}">
+    <meta name="description" content="{{ $config->summary ?? 'Portfolio profesional desarrollado con Laravel, Tailwind CSS y Alpine.js. Diseño moderno, responsivo y modo oscuro.' }}">
+    <meta name="keywords" content="portfolio, desarrollador web, full-stack, Laravel, PHP, Tailwind CSS, Alpine.js, programador">
+    <meta name="author" content="{{ $config->name ?? 'Ramiro Núñez Valverde' }}">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="Spanish">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url('/') }}">
+    <meta property="og:title" content="{{ $config->name ?? 'Portfolio' }} - {{ $config->role ?? 'Full-Stack Web Developer' }}">
+    <meta property="og:description" content="{{ $config->summary ?? 'Portfolio profesional desarrollado con Laravel, Tailwind CSS y Alpine.js.' }}">
+    @if($config && $config->profile_image)
+    <meta property="og:image" content="{{ asset('storage/' . $config->profile_image) }}">
+    @else
+    <meta property="og:image" content="{{ asset('favicon.svg') }}">
+    @endif
+    <meta property="og:site_name" content="{{ $config->name ?? 'Portfolio' }}">
+    <meta property="og:locale" content="es_ES">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ url('/') }}">
+    <meta property="twitter:title" content="{{ $config->name ?? 'Portfolio' }} - {{ $config->role ?? 'Full-Stack Web Developer' }}">
+    <meta property="twitter:description" content="{{ $config->summary ?? 'Portfolio profesional desarrollado con Laravel, Tailwind CSS y Alpine.js.' }}">
+    @if($config && $config->profile_image)
+    <meta property="twitter:image" content="{{ asset('storage/' . $config->profile_image) }}">
+    @else
+    <meta property="twitter:image" content="{{ asset('favicon.svg') }}">
+    @endif
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <link rel="alternate icon" href="{{ asset('favicon.svg') }}">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{{ url('/') }}">
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
