@@ -102,12 +102,15 @@ portfolio_configs (1)
   - Resultados y aprendizajes
 * ✅ Habilidades agrupadas por categorías (Frontend, Backend, Database, DevOps, Design)
 * ✅ Barras de progreso para nivel de competencia
+* ✅ **Formulario de contacto funcional** - Envío de emails con Laravel Mailable
 * ✅ Sección de contacto con enlaces a GitHub, LinkedIn y Email
 * ✅ Animaciones suaves al hacer scroll
 * ✅ Navegación fluida con scroll suave
 * ✅ Favicon personalizado con inicial "R"
-* ✅ SEO optimizado con meta tags
+* ✅ SEO optimizado con meta tags dinámicos
 * ✅ Open Graph tags para compartir en redes sociales
+* ✅ Validación de formularios en servidor y cliente
+* ✅ Manejo de errores y feedback visual
 
 ### Sistema de Autenticación
 
@@ -142,6 +145,7 @@ portfolio_configs (1)
 * **Git** - Control de versiones
 * **NPM** - Gestor de paquetes Node.js
 * **XAMPP** - Entorno de desarrollo local
+* **Artisan CLI** - Comandos personalizados de Laravel
 
 ---
 
@@ -257,11 +261,18 @@ El portfolio estará disponible en: **http://localhost:8000**
 ```
 portfolio_ram/
 ├── app/
+│   ├── Console/
+│   │   └── Commands/
+│   │       └── UpdateProfileImage.php (Comando Artisan)
 │   ├── Http/
-│   │   └── Controllers/
-│   │       ├── PortfolioController.php
-│   │       ├── Auth/ (Controladores de autenticación)
-│   │       └── Admin/ (Controladores de administración)
+│   │   ├── Controllers/
+│   │   │   ├── PortfolioController.php
+│   │   │   ├── Auth/ (Controladores de autenticación)
+│   │   │   └── Admin/ (Controladores de administración)
+│   │   └── Requests/
+│   │       └── ContactFormRequest.php (Validación)
+│   ├── Mail/
+│   │   └── ContactFormMail.php (Mailable)
 │   ├── Models/
 │   │   ├── Project.php
 │   │   ├── Skill.php
@@ -280,6 +291,8 @@ portfolio_ram/
 │   ├── views/
 │   │   ├── portfolio/
 │   │   │   └── index.blade.php
+│   │   ├── emails/
+│   │   │   └── contact-form.blade.php (Plantilla de email)
 │   │   ├── auth/ (Vistas de autenticación)
 │   │   └── components/ (Componentes reutilizables)
 │   ├── css/
@@ -302,6 +315,8 @@ portfolio_ram/
 
 ### Agregar Foto de Perfil
 
+Usa el comando de Artisan (más elegante que scripts PHP):
+
 1. Coloca tu foto en: `storage/app/public/profile/`
 2. Nombres sugeridos: `profile.jpg`, `foto.jpg`, `photo.jpg`
 3. Ejecuta el comando de Artisan:
@@ -312,6 +327,29 @@ portfolio_ram/
    ```bash
    php artisan portfolio:update-photo mi-foto.jpg
    ```
+
+**Ventajas del comando Artisan:**
+- ✅ Sigue los estándares de Laravel
+- ✅ Integrado con el CLI del framework
+- ✅ Mensajes informativos y manejo de errores
+- ✅ Más profesional que scripts PHP en la raíz
+
+### Configurar Formulario de Contacto
+
+El formulario de contacto está completamente funcional. Solo necesitas configurar el email en `.env`:
+
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.mailtrap.io  # Para desarrollo
+MAIL_PORT=2525
+MAIL_USERNAME=tu_usuario
+MAIL_PASSWORD=tu_password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=noreply@ramironuva.com
+MAIL_FROM_NAME="Portfolio"
+```
+
+**Para desarrollo local:** Usa `MAIL_MAILER=log` para guardar emails en `storage/logs/laravel.log`
 
 ### Personalizar Información
 
@@ -367,25 +405,36 @@ Un panel de administración completo está en desarrollo para gestionar todo des
 - Un portfolio tiene muchas habilidades
 - Los proyectos tienen tecnologías almacenadas en JSON
 
+> 📊 **Ver diagrama completo:** [Diagrama ERD](docs/DATABASE_ERD.md)
+
 ---
 
 ## 🔒 Seguridad
 
 * ✅ Autenticación con Laravel Breeze
 * ✅ Middleware de protección de rutas
-* ✅ Validación de datos en servidor
+* ✅ Validación de datos en servidor (Form Requests)
 * ✅ Protección CSRF en todos los formularios
 * ✅ Sanitización de inputs
 * ✅ Hash de contraseñas con bcrypt
 * ✅ Tokens de sesión seguros
+* ✅ Validación de emails y datos de entrada
+* ✅ Manejo seguro de excepciones en formularios
 
 ---
 
 ## 🚀 Próximas Mejoras
 
+### Implementadas ✅
+
+- [x] **Formulario de Contacto Funcional** - Implementado con Laravel Mailable, validación completa y UX con Alpine.js
+- [x] **Comando Artisan para Foto de Perfil** - Reemplazo profesional del script PHP
+- [x] **Diagrama ERD Completo** - Documentación visual de la base de datos
+- [x] **Meta Tags Dinámicos** - SEO que se actualiza automáticamente desde la BD
+- [x] **Validación de Formularios** - Form Requests con mensajes personalizados
+
 ### En Desarrollo
 
-- [x] **Formulario de Contacto Funcional** - ✅ Implementado con Laravel Mailable
 - [ ] **Panel de Administración Completo** - CRUD desde interfaz web
 - [ ] **Sistema de Blog** - Artículos técnicos y proyectos
 - [ ] **Traducciones (i18n)** - Español e Inglés
@@ -457,12 +506,33 @@ FROM php:8.2-fpm
 
 ## 📚 Documentación Adicional
 
-- [Diagrama Entidad-Relación (ERD)](docs/DATABASE_ERD.md) - Estructura completa de la base de datos
-- [Instrucciones para Agregar Foto de Perfil](docs/INSTRUCCIONES_FOTO.md)
-- [Guía para Agregar Screenshots](docs/AGREGAR_SCREENSHOTS.md)
-- [Actualizar Descripción en GitHub](docs/ACTUALIZAR_DESCRIPCION_GITHUB.md)
+- [Diagrama Entidad-Relación (ERD)](docs/DATABASE_ERD.md) - Estructura completa de la base de datos con relaciones y consultas
+- [Instrucciones para Agregar Foto de Perfil](docs/INSTRUCCIONES_FOTO.md) - Guía para usar el comando Artisan
+- [Guía para Agregar Screenshots](docs/AGREGAR_SCREENSHOTS.md) - Cómo mejorar la documentación visual
+- [Actualizar Descripción en GitHub](docs/ACTUALIZAR_DESCRIPCION_GITHUB.md) - Pasos para actualizar el repositorio
 - [API Documentation](#) (Próximamente)
 - [Contributing Guidelines](#) (Próximamente)
+
+## 🎯 Comandos Artisan Útiles
+
+```bash
+# Actualizar foto de perfil
+php artisan portfolio:update-photo
+php artisan portfolio:update-photo nombre-archivo.jpg
+
+# Ver todas las rutas
+php artisan route:list
+
+# Limpiar caché
+php artisan cache:clear
+php artisan config:clear
+php artisan view:clear
+
+# Optimizar para producción
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
 
 ---
 
