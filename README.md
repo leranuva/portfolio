@@ -450,7 +450,10 @@ FROM php:8.2-fpm
 
 ## 📚 Documentación Adicional
 
-- [Guía de Instalación Detallada](SETUP.md)
+- [Guía de Instalación Detallada](docs/SETUP.md)
+- [Instrucciones para Agregar Foto de Perfil](docs/INSTRUCCIONES_FOTO.md)
+- [Guía para Agregar Screenshots](docs/AGREGAR_SCREENSHOTS.md)
+- [Actualizar Descripción en GitHub](docs/ACTUALIZAR_DESCRIPCION_GITHUB.md)
 - [API Documentation](#) (Próximamente)
 - [Contributing Guidelines](#) (Próximamente)
 
@@ -494,8 +497,8 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo [LICENSE](LICENSE) para
 
 <div align="center">
 
-_Desarrollado con ❤️ usando Laravel, Tailwind CSS y Alpine.js_
+_Desarrollado y diseñado por Ramiro Nunez usando Laravel, Tailwind CSS y Alpine.js_
 
-⭐ Si te gusta este proyecto, ¡dale una estrella en GitHub!
+Si te gusta este proyecto, ¡dale una estrella en GitHub!
 
 </div>
