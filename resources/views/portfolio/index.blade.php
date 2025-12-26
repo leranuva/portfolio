@@ -149,53 +149,141 @@
             <h2 class="text-4xl font-bold text-center mb-12">Proyectos Destacados</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @forelse($projects as $project)
-                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-2">
-                        @if($project->image)
-                            <img src="{{ asset('storage/' . $project->image) }}" alt="{{ $project->name }}" class="w-full h-48 object-cover">
-                        @else
-                            <div class="w-full h-48 bg-gradient-to-br from-blue-500 to-purple-600"></div>
-                        @endif
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group">
+                        <!-- Vista Previa del Sitio -->
+                        <div class="relative overflow-hidden bg-gray-100 dark:bg-gray-900">
+                            @if($project->image)
+                                <a href="{{ $project->live_url ?? '#' }}" target="_blank" class="block">
+                                    <img 
+                                        src="{{ asset('storage/' . $project->image) }}" 
+                                        alt="Vista previa de {{ $project->name }}" 
+                                        class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
+                                        loading="lazy"
+                                    >
+                                    <!-- Overlay con información al hover -->
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                                        <div class="p-4 text-white w-full">
+                                            <p class="text-sm font-medium mb-1">Haz clic para ver el sitio en vivo</p>
+                                            @if($project->live_url)
+                                                <p class="text-xs opacity-90">{{ parse_url($project->live_url, PHP_URL_HOST) }}</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <!-- Badge de "Live" -->
+                                    @if($project->live_url)
+                                        <div class="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+                                            🔴 Live
+                                        </div>
+                                    @endif
+                                </a>
+                            @else
+                                <!-- Placeholder mejorado con información del proyecto -->
+                                <a href="{{ $project->live_url ?? '#' }}" target="_blank" class="block relative h-64 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-500 flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
+                                    <div class="text-center text-white p-6">
+                                        <svg class="w-16 h-16 mx-auto mb-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+                                        </svg>
+                                        <h4 class="text-lg font-bold mb-2">{{ $project->name }}</h4>
+                                        <p class="text-sm opacity-90">Vista previa no disponible</p>
+                                        @if($project->live_url)
+                                            <p class="text-xs mt-2 opacity-75">Haz clic para visitar el sitio</p>
+                                        @endif
+                                    </div>
+                                    @if($project->live_url)
+                                        <div class="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+                                            🔴 Live
+                                        </div>
+                                    @endif
+                                </a>
+                            @endif
+                        </div>
+                        
+                        <!-- Contenido del Proyecto -->
                         <div class="p-6">
-                            <h3 class="text-2xl font-bold mb-2">{{ $project->name }}</h3>
-                            <p class="text-gray-600 dark:text-gray-400 mb-4">{{ $project->description }}</p>
+                            <h3 class="text-2xl font-bold mb-2 text-gray-900 dark:text-white">{{ $project->name }}</h3>
+                            <p class="text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">{{ $project->description }}</p>
                             
-                            <div class="mb-4">
-                                <h4 class="font-semibold mb-2">Problema/Resolución:</h4>
-                                <p class="text-sm text-gray-700 dark:text-gray-300">{{ $project->problem_solution }}</p>
-                            </div>
+                            <!-- Información colapsable con Alpine.js -->
+                            <div x-data="{ open: false }" class="mb-4">
+                                <button 
+                                    @click="open = !open" 
+                                    class="w-full text-left flex items-center justify-between text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition mb-2"
+                                >
+                                    <span>Ver más detalles</span>
+                                    <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
+                                
+                                <div 
+                                    x-show="open" 
+                                    x-transition:enter="transition ease-out duration-300"
+                                    x-transition:enter-start="opacity-0 transform -translate-y-2"
+                                    x-transition:enter-end="opacity-100 transform translate-y-0"
+                                    x-transition:leave="transition ease-in duration-200"
+                                    x-transition:leave-start="opacity-100 transform translate-y-0"
+                                    x-transition:leave-end="opacity-0 transform -translate-y-2"
+                                    class="space-y-3 text-sm"
+                                >
+                                    <div>
+                                        <h4 class="font-semibold mb-1 text-gray-900 dark:text-white">Problema/Resolución:</h4>
+                                        <p class="text-gray-700 dark:text-gray-300 text-xs">{{ Str::limit($project->problem_solution, 150) }}</p>
+                                    </div>
 
-                            <div class="mb-4">
-                                <h4 class="font-semibold mb-2">Mi Rol:</h4>
-                                <p class="text-sm text-gray-700 dark:text-gray-300">{{ $project->role }}</p>
+                                    <div>
+                                        <h4 class="font-semibold mb-1 text-gray-900 dark:text-white">Mi Rol:</h4>
+                                        <p class="text-gray-700 dark:text-gray-300 text-xs">{{ Str::limit($project->role, 120) }}</p>
+                                    </div>
+
+                                    @if($project->results_learnings)
+                                        <div>
+                                            <h4 class="font-semibold mb-1 text-gray-900 dark:text-white">Resultados:</h4>
+                                            <p class="text-gray-700 dark:text-gray-300 text-xs">{{ Str::limit($project->results_learnings, 120) }}</p>
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
 
                             @if($project->technologies)
                                 <div class="mb-4">
-                                    <h4 class="font-semibold mb-2">Tecnologías:</h4>
+                                    <h4 class="font-semibold mb-2 text-sm text-gray-900 dark:text-white">Tecnologías:</h4>
                                     <div class="flex flex-wrap gap-2">
-                                        @foreach($project->technologies as $tech)
-                                            <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded">{{ $tech }}</span>
+                                        @foreach(array_slice($project->technologies, 0, 5) as $tech)
+                                            <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded font-medium">{{ $tech }}</span>
                                         @endforeach
+                                        @if(count($project->technologies) > 5)
+                                            <span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs rounded">
+                                                +{{ count($project->technologies) - 5 }}
+                                            </span>
+                                        @endif
                                     </div>
                                 </div>
                             @endif
 
-                            @if($project->results_learnings)
-                                <div class="mb-4">
-                                    <h4 class="font-semibold mb-2">Resultados:</h4>
-                                    <p class="text-sm text-gray-700 dark:text-gray-300">{{ $project->results_learnings }}</p>
-                                </div>
-                            @endif
-
-                            <div class="flex space-x-2 mt-4">
+                            <!-- Botones de Acción -->
+                            <div class="flex space-x-2 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                                 @if($project->live_url)
-                                    <a href="{{ $project->live_url }}" target="_blank" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition">
-                                        Ver Demo
+                                    <a 
+                                        href="{{ $project->live_url }}" 
+                                        target="_blank" 
+                                        class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition transform hover:scale-105 flex items-center justify-center space-x-2"
+                                    >
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                        </svg>
+                                        <span>Ver Sitio</span>
                                     </a>
                                 @endif
                                 @if($project->repository_url)
-                                    <a href="{{ $project->repository_url }}" target="_blank" class="px-4 py-2 border border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600 rounded text-sm transition">
-                                        Repositorio
+                                    <a 
+                                        href="{{ $project->repository_url }}" 
+                                        target="_blank" 
+                                        class="px-4 py-2 border-2 border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 rounded-lg text-sm font-medium transition flex items-center justify-center space-x-2 text-gray-700 dark:text-gray-300"
+                                    >
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                                        </svg>
+                                        <span>Code</span>
                                     </a>
                                 @endif
                             </div>
