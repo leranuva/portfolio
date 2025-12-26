@@ -241,12 +241,104 @@
 
     <!-- Contact Section -->
     <section id="contact" class="py-20 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-4xl mx-auto text-center">
-            <h2 class="text-4xl font-bold mb-12">Contacto</h2>
-            <p class="text-lg text-gray-700 dark:text-gray-300 mb-8">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-4xl font-bold text-center mb-12">Contacto</h2>
+            <p class="text-lg text-gray-700 dark:text-gray-300 text-center mb-8">
                 ¿Tienes un proyecto en mente? Me encantaría escucharte.
             </p>
-            <div class="flex justify-center space-x-6 mb-8">
+            
+            <!-- Contact Form -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-8" x-data="contactForm()">
+                <form @submit.prevent="submitForm" class="space-y-6">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Nombre <span class="text-red-500">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="name" 
+                            name="name" 
+                            x-model="form.name"
+                            required
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                            placeholder="Tu nombre completo"
+                        >
+                        <p x-show="errors.name" x-text="errors.name" class="mt-1 text-sm text-red-600 dark:text-red-400"></p>
+                    </div>
+
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Email <span class="text-red-500">*</span>
+                        </label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            x-model="form.email"
+                            required
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                            placeholder="tu@email.com"
+                        >
+                        <p x-show="errors.email" x-text="errors.email" class="mt-1 text-sm text-red-600 dark:text-red-400"></p>
+                    </div>
+
+                    <div>
+                        <label for="subject" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Asunto <span class="text-red-500">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="subject" 
+                            name="subject" 
+                            x-model="form.subject"
+                            required
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                            placeholder="¿Sobre qué quieres hablar?"
+                        >
+                        <p x-show="errors.subject" x-text="errors.subject" class="mt-1 text-sm text-red-600 dark:text-red-400"></p>
+                    </div>
+
+                    <div>
+                        <label for="message" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Mensaje <span class="text-red-500">*</span>
+                        </label>
+                        <textarea 
+                            id="message" 
+                            name="message" 
+                            x-model="form.message"
+                            required
+                            rows="6"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 resize-none"
+                            placeholder="Cuéntame sobre tu proyecto o idea..."
+                        ></textarea>
+                        <p x-show="errors.message" x-text="errors.message" class="mt-1 text-sm text-red-600 dark:text-red-400"></p>
+                    </div>
+
+                    <!-- Success/Error Messages -->
+                    <div x-show="successMessage" x-cloak class="p-4 bg-green-100 dark:bg-green-900 border border-green-400 dark:border-green-700 text-green-700 dark:text-green-300 rounded-lg">
+                        <p x-text="successMessage"></p>
+                    </div>
+                    <div x-show="errorMessage" x-cloak class="p-4 bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 rounded-lg">
+                        <p x-text="errorMessage"></p>
+                    </div>
+
+                    <button 
+                        type="submit" 
+                        :disabled="loading"
+                        class="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white rounded-lg transition transform hover:scale-105 flex items-center justify-center space-x-2"
+                    >
+                        <svg x-show="loading" class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span x-show="!loading">Enviar Mensaje</span>
+                        <span x-show="loading">Enviando...</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Social Links -->
+            <div class="flex justify-center space-x-6">
                 @if($config && $config->email)
                     <a href="mailto:{{ $config->email }}" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition transform hover:scale-105 flex items-center space-x-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -280,8 +372,62 @@
         <p>&copy; {{ date('Y') }} {{ $config->name ?? 'Portfolio' }}. Todos los derechos reservados.</p>
     </footer>
 
-    <!-- Smooth Scroll Script -->
+    <!-- Scripts -->
     <script>
+        // Contact Form Manager
+        function contactForm() {
+            return {
+                form: {
+                    name: '',
+                    email: '',
+                    subject: '',
+                    message: ''
+                },
+                errors: {},
+                loading: false,
+                successMessage: '',
+                errorMessage: '',
+                
+                async submitForm() {
+                    this.loading = true;
+                    this.errors = {};
+                    this.successMessage = '';
+                    this.errorMessage = '';
+                    
+                    try {
+                        const response = await fetch('{{ route("portfolio.contact") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                            },
+                            body: JSON.stringify(this.form)
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            this.successMessage = data.message;
+                            this.form = { name: '', email: '', subject: '', message: '' };
+                            setTimeout(() => {
+                                this.successMessage = '';
+                            }, 5000);
+                        } else {
+                            if (data.errors) {
+                                this.errors = data.errors;
+                            } else {
+                                this.errorMessage = data.message || 'Hubo un error al enviar el mensaje.';
+                            }
+                        }
+                    } catch (error) {
+                        this.errorMessage = 'Error de conexión. Por favor, intenta nuevamente.';
+                    } finally {
+                        this.loading = false;
+                    }
+                }
+            };
+        }
+        
         // Dark Mode Manager
         function darkModeManager() {
             const defaultDark = {{ ($config && $config->dark_mode_enabled) ? 'true' : 'false' }};
