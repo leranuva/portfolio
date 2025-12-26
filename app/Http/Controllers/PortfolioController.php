@@ -47,6 +47,8 @@ class PortfolioController extends Controller
                 'message' => '¡Mensaje enviado exitosamente! Te responderé pronto.'
             ]);
         } catch (\Exception $e) {
+            \Log::error('Error sending contact form: ' . $e->getMessage());
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Hubo un error al enviar el mensaje. Por favor, intenta nuevamente.'

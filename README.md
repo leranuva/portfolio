@@ -304,7 +304,14 @@ portfolio_ram/
 
 1. Coloca tu foto en: `storage/app/public/profile/`
 2. Nombres sugeridos: `profile.jpg`, `foto.jpg`, `photo.jpg`
-3. Ejecuta: `php update_profile_image.php`
+3. Ejecuta el comando de Artisan:
+   ```bash
+   php artisan portfolio:update-photo
+   ```
+   O especifica el archivo:
+   ```bash
+   php artisan portfolio:update-photo mi-foto.jpg
+   ```
 
 ### Personalizar Información
 
@@ -378,8 +385,8 @@ Un panel de administración completo está en desarrollo para gestionar todo des
 
 ### En Desarrollo
 
+- [x] **Formulario de Contacto Funcional** - ✅ Implementado con Laravel Mailable
 - [ ] **Panel de Administración Completo** - CRUD desde interfaz web
-- [ ] **Formulario de Contacto Funcional** - Envío de emails con validación
 - [ ] **Sistema de Blog** - Artículos técnicos y proyectos
 - [ ] **Traducciones (i18n)** - Español e Inglés
 - [ ] **Sistema de Comentarios** - Para proyectos y blog
@@ -450,7 +457,7 @@ FROM php:8.2-fpm
 
 ## 📚 Documentación Adicional
 
-- [Guía de Instalación Detallada](docs/SETUP.md)
+- [Diagrama Entidad-Relación (ERD)](docs/DATABASE_ERD.md) - Estructura completa de la base de datos
 - [Instrucciones para Agregar Foto de Perfil](docs/INSTRUCCIONES_FOTO.md)
 - [Guía para Agregar Screenshots](docs/AGREGAR_SCREENSHOTS.md)
 - [Actualizar Descripción en GitHub](docs/ACTUALIZAR_DESCRIPCION_GITHUB.md)
