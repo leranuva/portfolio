@@ -94,12 +94,14 @@ portfolio_configs (1)
 * ✅ Sección Hero personalizable con foto de perfil
 * ✅ Sección "Sobre mí" con valores y estilo
 * ✅ Proyectos destacados con detalles completos:
+  - **Vista previa visual del sitio** - Imagen destacada con efectos hover
   - Descripción del proyecto
   - Problema/Resolución
   - Rol y responsabilidades
   - Tecnologías utilizadas
   - Enlaces a demo y repositorio
   - Resultados y aprendizajes
+  - Información colapsable para mejor organización
 * ✅ Habilidades agrupadas por categorías (Frontend, Backend, Database, DevOps, Design)
 * ✅ Barras de progreso para nivel de competencia
 * ✅ **Formulario de contacto funcional** - Envío de emails con Laravel Mailable
@@ -507,6 +509,7 @@ FROM php:8.2-fpm
 ## 📚 Documentación Adicional
 
 - [Diagrama Entidad-Relación (ERD)](docs/DATABASE_ERD.md) - Estructura completa de la base de datos con relaciones y consultas
+- [Agregar Vista Previa de Proyectos](docs/AGREGAR_PREVIEW_PROYECTOS.md) - Cómo agregar imágenes de preview a los proyectos
 - [Instrucciones para Agregar Foto de Perfil](docs/INSTRUCCIONES_FOTO.md) - Guía para usar el comando Artisan
 - [Guía para Agregar Screenshots](docs/AGREGAR_SCREENSHOTS.md) - Cómo mejorar la documentación visual
 - [Actualizar Descripción en GitHub](docs/ACTUALIZAR_DESCRIPCION_GITHUB.md) - Pasos para actualizar el repositorio
