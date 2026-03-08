@@ -11,11 +11,11 @@ Documento de estado: qué está implementado y qué falta por hacer.
 | Área | Estado | Completitud |
 |------|--------|-------------|
 | Backend y BD | ✅ Implementado | 100% |
-| Panel Admin (Filament) | ✅ Implementado | 95% |
+| Panel Admin (Filament) | ✅ Implementado | 100% |
 | Frontend (secciones) | ✅ Implementado | 100% |
 | Funnel de leads | ✅ Implementado | 100% |
 | SEO básico | ✅ Implementado | 90% |
-| Blog (páginas individuales) | ⚠️ Parcial | 40% |
+| Blog (páginas individuales) | ✅ Implementado | 100% |
 | Despliegue | ⏳ Pendiente | 0% |
 | Marketing (acciones manuales) | ⏳ Pendiente | 0% |
 
@@ -71,7 +71,7 @@ Documento de estado: qué está implementado y qué falta por hacer.
 
 **Perfil:** Cambio de contraseña en `/admin/profile`
 
-**Pendiente:** Dashboard con widgets (mensajes recientes, proyectos publicados) — mencionado en guía, no implementado.
+**Dashboard:** Widgets de captación (leads del mes, leads calientes, conversión, últimos 5 leads).
 
 ---
 
@@ -87,7 +87,7 @@ Documento de estado: qué está implementado y qué falta por hacer.
 | Skills | #skills | ✅ | BD, barras animadas, iconos Heroicons |
 | Services | #services | ✅ | BD, cards con iconos |
 | Portfolio | #portfolio | ✅ | BD, filtro categorías, modal detalle, YouTube/Vimeo |
-| Blog | #blog | ✅ | BD, últimos 6 posts (sin enlaces a posts) |
+| Blog | #blog | ✅ | BD, últimos 6 posts con enlaces a `/blog/{slug}` |
 | Contact | #contact | ✅ | Formulario Livewire + redes + CV |
 | Calendly | #calendly | ✅ | Embed condicional (Site Settings) |
 
@@ -118,7 +118,10 @@ Documento de estado: qué está implementado y qué falta por hacer.
 | Clasificación frío/medio/caliente | ✅ |
 | Creación Lead + ContactMessage | ✅ |
 | Email notificación al admin | ✅ `ContactMessageReceived` |
-| Job `SyncLeadToEmailProvider` | ✅ Webhook + Brevo |
+| Email automático al cliente | ✅ `LeadReceived` |
+| Secuencia follow-ups (+2, +5, +10 días) | ✅ `SendLeadFollowup` + `LeadFollowupMail` |
+| Job `SyncLeadToEmailProvider` | ✅ Webhook + Brevo + scheduleFollowups |
+| Pipeline de ventas (estados) | ✅ contacted, meeting_scheduled, proposal_sent, won, lost |
 | Config `lead_automation.php` | ✅ |
 | Variables .env (LEAD_WEBHOOK_URL, BREVO_*) | ✅ Documentadas en .env.example |
 
@@ -151,18 +154,11 @@ Documento de estado: qué está implementado y qué falta por hacer.
 
 ## 2.1 Prioridad alta
 
-### Blog — Páginas individuales
-- **Estado:** Los posts se muestran en la home pero no tienen enlace ni página de detalle.
-- **Falta:**
-  - Ruta `GET /blog/{slug}` para artículo individual
-  - Vista `blog.show` con contenido completo
-  - Enlaces desde las cards del blog a la página del post
-- **Impacto:** SEO y experiencia de usuario para contenido largo.
+### ~~Blog — Páginas individuales~~ ✅ Implementado
+- Ruta `GET /blog/{slug}`, vista `blog.show`, enlaces desde cards, sitemap con URLs.
 
-### Sitemap completo
-- **Estado:** Solo incluye la URL principal.
-- **Falta:** Añadir URLs de posts del blog (y opcionalmente proyectos si se crean páginas individuales).
-- **Archivo:** `app/Http/Controllers/SitemapController.php`
+### ~~Sitemap completo~~ ✅ Parcial
+- Incluye homepage + URLs de posts del blog.
 
 ### Despliegue a producción
 - **Estado:** No desplegado.
@@ -190,15 +186,14 @@ Documento de estado: qué está implementado y qué falta por hacer.
 - **Estado:** Existe `POST /contact` con `ContactController` y `ContactFormRequest` (campos: name, email, subject, message). El formulario real usa Livewire y crea Lead + ContactMessage.
 - **Acción:** Eliminar o documentar como API alternativa. Actualmente no se usa.
 
-### Dashboard Filament con widgets
-- **Estado:** No implementado.
-- **Falta:** Widgets de mensajes recientes, proyectos publicados, leads del mes (opcional).
+### ~~Dashboard Filament con widgets~~ ✅ Implementado
+- LeadsStatsWidget (leads mes, calientes, conversión), LatestLeadsWidget (últimos 5).
 
 ---
 
 ## 2.3 Prioridad baja / opcional
 
-### Blog — Página índice
+### Blog — Página índice (opcional)
 - **Falta:** Ruta `/blog` con listado paginado de todos los posts (ahora solo se muestran 6 en home).
 
 ### Proyectos — Páginas individuales
@@ -254,10 +249,21 @@ routes/
 
 # 4. Próximos pasos recomendados
 
-1. **Inmediato:** Crear página individual de blog (`/blog/{slug}`) y enlazar desde las cards.
-2. **Antes de producción:** Ampliar sitemap con URLs de blog; configurar Brevo si se usará email automation.
-3. **Producción:** Seguir checklist de deployment; configurar worker de cola.
-4. **Opcional:** Dashboard Filament, limpieza de `POST /contact`, tests.
+1. **Antes de producción:** Configurar Brevo si se usará email automation; configurar worker de cola.
+2. **Producción:** Seguir checklist de deployment en FASE_8_COMPLETADA.md.
+3. **Opcional:** Página índice `/blog`, limpieza de `POST /contact`, tests.
+
+---
+
+# 5. Documentación de automatización
+
+Ver [AUTOMATIZACION_LEADS_IMPLEMENTADA.md](AUTOMATIZACION_LEADS_IMPLEMENTADA.md) para:
+- Flujo completo del sistema de captación
+- Email automático al cliente (LeadReceived)
+- Secuencia de follow-ups (+2, +5, +10 días)
+- Pipeline de ventas (estados)
+- Dashboard de captación
+- Configuración y variables de entorno
 
 ---
 

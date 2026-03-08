@@ -31,4 +31,16 @@ class BlogPost extends Model
         return $query->whereNotNull('published_at')
             ->where('published_at', '<=', now());
     }
+
+    /**
+     * Get the public URL for the post image.
+     */
+    public function getImageUrlAttribute(): ?string
+    {
+        if (empty($this->image)) {
+            return null;
+        }
+
+        return asset('storage/' . ltrim($this->image, '/'));
+    }
 }

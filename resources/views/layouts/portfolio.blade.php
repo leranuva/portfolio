@@ -16,19 +16,20 @@
     </script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="{{ $metaDescription ?? config('app.name') }}">
+    <meta name="description" content="@yield('metaDescription', $metaDescription ?? config('app.name'))">
 
-    <title>{{ $metaTitle ?? config('app.name') }}</title>
+    <title>@yield('metaTitle', $metaTitle ?? config('app.name'))</title>
 
     {{-- Open Graph --}}
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="{{ $metaTitle ?? config('app.name') }}">
-    <meta property="og:description" content="{{ $metaDescription ?? config('app.name') }}">
+    <meta property="og:title" content="@yield('metaTitle', $metaTitle ?? config('app.name'))">
+    <meta property="og:description" content="@yield('metaDescription', $metaDescription ?? config('app.name'))">
     <meta property="og:locale" content="{{ str_replace('_', '-', app()->getLocale()) }}">
     @if($ogImage ?? null)
         <meta property="og:image" content="{{ $ogImage }}">
     @endif
+    @yield('ogImage')
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
 

@@ -12,14 +12,15 @@
         @if(($blogPosts ?? collect())->isNotEmpty())
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach($blogPosts as $index => $post)
-                    <article class="group rounded-2xl overflow-hidden border border-zinc-200/60 dark:border-zinc-700/40 hover:border-indigo-300 dark:hover:border-indigo-600/40 hover:shadow-xl hover:shadow-indigo-500/5 hover:-translate-y-1 transition-all duration-500"
+                    <a href="{{ route('blog.show', $post->slug) }}" class="block group">
+                    <article class="rounded-2xl overflow-hidden border border-zinc-200/60 dark:border-zinc-700/40 hover:border-indigo-300 dark:hover:border-indigo-600/40 hover:shadow-xl hover:shadow-indigo-500/5 hover:-translate-y-1 transition-all duration-500"
                              x-data="{ visible: false }"
                              x-intersect.once="visible = true"
                              :class="visible ? 'animate-fade-in-up' : 'opacity-0'"
                              :style="'animation-delay: ' + ({{ $index * 100 }}) + 'ms'">
                         <div class="aspect-[16/10] overflow-hidden">
                             @if($post->image)
-                                <img src="{{ Storage::url($post->image) }}"
+                                <img src="{{ $post->image_url }}"
                                      alt="{{ $post->title }}"
                                      loading="lazy"
                                      decoding="async"
@@ -46,6 +47,7 @@
                             @endif
                         </div>
                     </article>
+                    </a>
                 @endforeach
             </div>
         @else

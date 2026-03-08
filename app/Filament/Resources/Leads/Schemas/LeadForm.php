@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Leads\Schemas;
 
+use App\Models\Lead;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -35,12 +36,20 @@ class LeadForm
                     ->columnSpanFull(),
                 TextInput::make('score')
                     ->disabled(),
+                TextInput::make('source')
+                    ->label('Source')
+                    ->disabled(),
+                TextInput::make('utm_source')
+                    ->label('UTM Source')
+                    ->disabled(),
+                TextInput::make('utm_medium')
+                    ->label('UTM Medium')
+                    ->disabled(),
+                TextInput::make('utm_campaign')
+                    ->label('UTM Campaign')
+                    ->disabled(),
                 Select::make('status')
-                    ->options([
-                        'nuevo' => 'New',
-                        'en_contacto' => 'In contact',
-                        'convertido' => 'Converted',
-                    ])
+                    ->options(Lead::statusOptions())
                     ->required()
                     ->native(false),
             ]);

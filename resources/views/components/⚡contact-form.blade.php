@@ -2,9 +2,12 @@
 
 use App\Jobs\SyncLeadToEmailProvider;
 use App\Mail\ContactMessageReceived;
+use App\Mail\HighIntentLeadReceived;
+use App\Mail\LeadReceived;
 use App\Models\ContactMessage;
 use App\Models\Lead;
 use App\Models\SiteSetting;
+use App\Services\LeadEventService;
 use App\Services\LeadScoringService;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
@@ -26,6 +29,26 @@ new class extends Component
     public string $message = '';
 
     public bool $success = false;
+
+    public ?string $utm_source = null;
+
+    public ?string $utm_medium = null;
+
+    public ?string $utm_campaign = null;
+
+    public function mount(): void
+    {
+        $this->utm_source = request()->query('utm_source') ?? session('utm_source');
+        $this->utm_medium = request()->query('utm_medium') ?? session('utm_medium');
+        $this->utm_campaign = request()->query('utm_campaign') ?? session('utm_campaign');
+        if (request()->hasAny(['utm_source', 'utm_medium', 'utm_campaign'])) {
+            session([
+                'utm_source' => request()->query('utm_source'),
+                'utm_medium' => request()->query('utm_medium'),
+                'utm_campaign' => request()->query('utm_campaign'),
+            ]);
+        }
+    }
 
     protected function rules(): array
     {
@@ -72,7 +95,13 @@ new class extends Component
             ...$data,
             'score' => $score,
             'status' => Lead::STATUS_NUEVO,
+            'source' => Lead::SOURCE_CONTACT,
+            'utm_source' => $this->utm_source,
+            'utm_medium' => $this->utm_medium,
+            'utm_campaign' => $this->utm_campaign,
         ]);
+
+        app(LeadEventService::class)->record($lead, \App\Models\LeadEvent::TYPE_LEAD_CREATED, ['score' => $score]);
 
         // Also create contact message for admin notification (backward compatibility)
         $contactMessage = ContactMessage::create([
@@ -86,6 +115,13 @@ new class extends Component
         if ($adminEmail) {
             Mail::to($adminEmail)->send(new ContactMessageReceived($contactMessage));
         }
+
+        // Email automático al cliente: hot (score >= 10) → CTA directo Calendly; cold → LeadReceived
+        $mailable = $score >= 10
+            ? new HighIntentLeadReceived($lead)
+            : new LeadReceived($lead);
+        Mail::to($lead->email)->queue($mailable);
+        app(LeadEventService::class)->record($lead, \App\Models\LeadEvent::TYPE_EMAIL_SENT, ['type' => $score >= 10 ? 'high_intent' : 'standard']);
 
         SyncLeadToEmailProvider::dispatch($lead);
 

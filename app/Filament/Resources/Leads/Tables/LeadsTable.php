@@ -52,13 +52,18 @@ class LeadsTable
                         'medio' => 'warning',
                         default => 'gray',
                     }),
+                TextColumn::make('source')
+                    ->label('Source')
+                    ->badge()
+                    ->default('—'),
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn (string $state): string => ucfirst(str_replace('_', ' ', $state)))
+                    ->formatStateUsing(fn (string $state): string => Lead::statusOptions()[$state] ?? ucfirst(str_replace('_', ' ', $state)))
                     ->color(fn (string $state): string => match ($state) {
-                        'convertido' => 'success',
-                        'en_contacto' => 'warning',
+                        'won', 'convertido' => 'success',
+                        'contacted', 'meeting_scheduled', 'proposal_sent', 'en_contacto' => 'warning',
+                        'lost' => 'danger',
                         default => 'gray',
                     }),
                 TextColumn::make('created_at')
@@ -68,11 +73,7 @@ class LeadsTable
             ])
             ->filters([
                 SelectFilter::make('status')
-                    ->options([
-                        'nuevo' => 'New',
-                        'en_contacto' => 'In contact',
-                        'convertido' => 'Converted',
-                    ]),
+                    ->options(Lead::statusOptions()),
                 SelectFilter::make('quality')
                     ->options([
                         'caliente' => 'Hot (9+)',

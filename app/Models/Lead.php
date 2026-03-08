@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Lead extends Model
 {
@@ -12,11 +13,39 @@ class Lead extends Model
 
     public const STATUS_CONVERTIDO = 'convertido';
 
+    public const STATUS_CONTACTED = 'contacted';
+
+    public const STATUS_MEETING_SCHEDULED = 'meeting_scheduled';
+
+    public const STATUS_PROPOSAL_SENT = 'proposal_sent';
+
+    public const STATUS_WON = 'won';
+
+    public const STATUS_LOST = 'lost';
+
+    public static function statusOptions(): array
+    {
+        return [
+            'nuevo' => 'New',
+            'contacted' => 'Contacted',
+            'meeting_scheduled' => 'Meeting scheduled',
+            'proposal_sent' => 'Proposal sent',
+            'won' => 'Won',
+            'lost' => 'Lost',
+            // Legacy
+            'en_contacto' => 'In contact',
+            'convertido' => 'Converted',
+        ];
+    }
+
     public const QUALITY_FRIO = 'frio';
 
     public const QUALITY_MEDIO = 'medio';
 
     public const QUALITY_CALIENTE = 'caliente';
+
+    public const SOURCE_CONTACT = 'contact';
+    public const SOURCE_LEAD_MAGNET = 'lead_magnet';
 
     protected $fillable = [
         'name',
@@ -28,6 +57,10 @@ class Lead extends Model
         'message',
         'score',
         'status',
+        'source',
+        'utm_source',
+        'utm_medium',
+        'utm_campaign',
     ];
 
     protected function casts(): array
@@ -63,5 +96,10 @@ class Lead extends Model
     public function scopeOrderByScore($query, string $direction = 'desc'): void
     {
         $query->orderBy('score', $direction);
+    }
+
+    public function events(): HasMany
+    {
+        return $this->hasMany(LeadEvent::class);
     }
 }

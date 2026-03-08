@@ -45,7 +45,17 @@ class PortfolioDataService
 
     public function getSkillsGroupedByCategory(): Collection
     {
-        $categoryOrder = ['Frontend', 'Backend', 'Database', 'DevOps', 'Design'];
+        $categoryOrder = [
+            'Fundamentals',
+            'Frontend',
+            'Backend',
+            'Databases',
+            'DevOps & Cloud',
+            'Testing',
+            'AI Integration',
+            'Tools',
+            'Architecture',
+        ];
         $grouped = Skill::ordered()->get()->groupBy('category');
 
         return collect($categoryOrder)

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\SendLeadFollowup;
 use App\Models\Lead;
 use Brevo\Brevo;
 use Brevo\Contacts\Requests\CreateContactRequest;
@@ -14,6 +15,18 @@ class LeadAutomationService
     {
         $this->sendWebhook($lead);
         $this->syncToBrevo($lead);
+        $this->scheduleFollowups($lead);
+    }
+
+    protected function scheduleFollowups(Lead $lead): void
+    {
+        if (! config('lead_automation.followup_emails_enabled', true)) {
+            return;
+        }
+
+        SendLeadFollowup::dispatch($lead, 1)->delay(now()->addDays(2));
+        SendLeadFollowup::dispatch($lead, 2)->delay(now()->addDays(5));
+        SendLeadFollowup::dispatch($lead, 3)->delay(now()->addDays(10));
     }
 
     protected function sendWebhook(Lead $lead): void

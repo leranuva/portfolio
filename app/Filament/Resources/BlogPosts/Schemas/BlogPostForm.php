@@ -23,7 +23,10 @@ class BlogPostForm
                 Textarea::make('content')
                     ->columnSpanFull(),
                 FileUpload::make('image')
-                    ->image(),
+                    ->disk('public')
+                    ->directory('blog')
+                    ->image()
+                    ->visibility('public'),
                 DateTimePicker::make('published_at'),
             ]);
     }

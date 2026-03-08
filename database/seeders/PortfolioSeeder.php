@@ -10,6 +10,7 @@ use App\Models\SiteSetting;
 use App\Models\Skill;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class PortfolioSeeder extends Seeder
 {
@@ -53,28 +54,60 @@ class PortfolioSeeder extends Seeder
     private function seedSkills(): void
     {
         $skills = [
-            ['HTML5', 95, 'code-bracket', 'Frontend', 1],
-            ['CSS3', 90, 'paint-brush', 'Frontend', 2],
-            ['JavaScript', 88, 'code-bracket-square', 'Frontend', 3],
-            ['Vue.js', 85, 'sparkles', 'Frontend', 4],
-            ['React', 80, 'sparkles', 'Frontend', 5],
-            ['Tailwind CSS', 90, 'paint-brush', 'Frontend', 6],
-            ['PHP', 92, 'code-bracket', 'Backend', 7],
-            ['Laravel', 90, 'server-stack', 'Backend', 8],
-            ['Node.js', 85, 'server', 'Backend', 9],
-            ['Python', 75, 'code-bracket', 'Backend', 10],
-            ['RESTful APIs', 88, 'server-stack', 'Backend', 11],
-            ['MySQL', 90, 'circle-stack', 'Database', 12],
-            ['PostgreSQL', 80, 'circle-stack', 'Database', 13],
-            ['MongoDB', 75, 'circle-stack', 'Database', 14],
-            ['Redis', 70, 'circle-stack', 'Database', 15],
-            ['Git', 90, 'cube', 'DevOps', 16],
-            ['Docker', 80, 'cube', 'DevOps', 17],
-            ['CI/CD', 75, 'arrow-path', 'DevOps', 18],
-            ['AWS', 70, 'cloud', 'DevOps', 19],
-            ['Figma', 85, 'pencil-square', 'Design', 20],
-            ['UI/UX Design', 80, 'sparkles', 'Design', 21],
-            ['Responsive Design', 95, 'device-phone-mobile', 'Design', 22],
+            // 1. Fundamentals
+            ['Semantic HTML5', 95, 'code-bracket', 'Fundamentals', 1],
+            ['Modern CSS (Flexbox, Grid)', 92, 'paint-brush', 'Fundamentals', 2],
+            ['Animations & Responsive', 90, 'device-phone-mobile', 'Fundamentals', 3],
+            ['Advanced JavaScript (ES6+)', 90, 'code-bracket-square', 'Fundamentals', 4],
+            ['async/await, modules, closures', 88, 'sparkles', 'Fundamentals', 5],
+            ['TypeScript', 85, 'code-bracket', 'Fundamentals', 6],
+            // 2. Frontend
+            ['React', 88, 'sparkles', 'Frontend', 7],
+            ['Next.js', 85, 'globe-alt', 'Frontend', 8],
+            ['Vue.js', 85, 'sparkles', 'Frontend', 9],
+            ['Svelte / SvelteKit', 75, 'sparkles', 'Frontend', 10],
+            ['Tailwind CSS', 92, 'paint-brush', 'Frontend', 11],
+            ['State management (Redux, Zustand, Pinia)', 82, 'squares-2x2', 'Frontend', 12],
+            ['Accessibility (a11y)', 85, 'user-circle', 'Frontend', 13],
+            ['PWA & Web Components', 78, 'puzzle-piece', 'Frontend', 14],
+            // 3. Backend
+            ['Node.js', 88, 'server', 'Backend', 15],
+            ['Laravel / PHP', 90, 'server-stack', 'Backend', 16],
+            ['Express.js / NestJS', 82, 'cube', 'Backend', 17],
+            ['Django / FastAPI', 78, 'code-bracket-square', 'Backend', 18],
+            ['REST APIs & GraphQL', 90, 'arrow-path', 'Backend', 19],
+            ['Authentication (JWT, OAuth)', 88, 'key', 'Backend', 20],
+            ['Microservices & modular architecture', 85, 'squares-plus', 'Backend', 21],
+            // 4. Databases
+            ['PostgreSQL', 88, 'circle-stack', 'Databases', 22],
+            ['MySQL', 88, 'circle-stack', 'Databases', 23],
+            ['MongoDB', 82, 'circle-stack', 'Databases', 24],
+            ['Redis (cache)', 85, 'circle-stack', 'Databases', 25],
+            ['ORMs (Prisma, TypeORM)', 85, 'table-cells', 'Databases', 26],
+            ['Schema design & optimization', 88, 'chart-bar', 'Databases', 27],
+            // 5. DevOps & Cloud
+            ['Docker', 88, 'cube', 'DevOps & Cloud', 28],
+            ['Kubernetes (basics)', 75, 'cloud', 'DevOps & Cloud', 29],
+            ['CI/CD pipelines', 85, 'arrow-path', 'DevOps & Cloud', 30],
+            ['AWS / GCP / Azure', 80, 'cloud', 'DevOps & Cloud', 31],
+            ['Monitoring', 82, 'chart-bar', 'DevOps & Cloud', 32],
+            // 6. Testing
+            ['Jest (unit testing)', 88, 'beaker', 'Testing', 33],
+            ['Cypress / Playwright (e2e)', 85, 'play', 'Testing', 34],
+            ['Integration testing', 85, 'check-badge', 'Testing', 35],
+            // 7. AI Integration
+            ['AI APIs (OpenAI)', 82, 'sparkles', 'AI Integration', 36],
+            ['LangChain, RAG, embeddings', 78, 'sparkles', 'AI Integration', 37],
+            ['Chatbots & AI automation', 80, 'chat-bubble-left-right', 'AI Integration', 38],
+            // 8. Tools
+            ['Git / GitHub', 92, 'code-bracket-square', 'Tools', 39],
+            ['VS Code', 90, 'code-bracket-square', 'Tools', 40],
+            ['Monorepos & package managers', 85, 'folder', 'Tools', 41],
+            // 9. Architecture
+            ['Clean Architecture', 88, 'cube', 'Architecture', 42],
+            ['Domain Driven Design', 85, 'squares-2x2', 'Architecture', 43],
+            ['API design & scalability', 88, 'server-stack', 'Architecture', 44],
+            ['Web security', 88, 'shield-check', 'Architecture', 45],
         ];
 
         foreach ($skills as [$name, $percentage, $icon, $category, $order]) {
@@ -130,7 +163,7 @@ class PortfolioSeeder extends Seeder
         $categories = [
             ['E-commerce', 'ecommerce', 1],
             ['Web App', 'web-app', 2],
-            ['Sistema Empresarial', 'sistema-empresarial', 3],
+            ['Enterprise System', 'sistema-empresarial', 3],
         ];
 
         foreach ($categories as [$name, $slug, $order]) {
@@ -185,6 +218,7 @@ class PortfolioSeeder extends Seeder
 
             Project::create([
                 'title' => $project['title'],
+                'slug' => Str::slug($project['title']),
                 'description' => $project['description'],
                 'image' => null,
                 'project_category_id' => $category?->id,

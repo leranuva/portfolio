@@ -56,7 +56,7 @@ El portfolio se ha transformado en una **máquina de captación de leads** con:
 | urgency | string | flexible, pronto, inmediato |
 | message | text | Detalles adicionales |
 | score | int | Lead score (0–15) |
-| status | string | nuevo, en_contacto, convertido |
+| status | string | nuevo, contacted, meeting_scheduled, proposal_sent, won, lost |
 | created_at, updated_at | timestamps | |
 
 ---
@@ -89,9 +89,10 @@ El portfolio se ha transformado en una **máquina de captación de leads** con:
 
 - **Ruta**: `/admin/leads`
 - **Listado**: nombre, email, tipo, presupuesto, urgencia, score, calidad, estado
-- **Filtros**: estado (nuevo/en contacto/convertido), calidad (frío/medio/caliente)
+- **Filtros**: estado (pipeline completo), calidad (frío/medio/caliente)
 - **Vista detalle**: todos los campos
-- **Edición**: solo el campo `status` (para mover leads por el funnel)
+- **Edición**: solo el campo `status` (pipeline: new, contacted, meeting_scheduled, proposal_sent, won, lost)
+- **Dashboard**: widgets de leads del mes, leads calientes, tasa de conversión, últimos 5 leads
 
 ---
 
@@ -104,6 +105,15 @@ El portfolio se ha transformado en una **máquina de captación de leads** con:
 ---
 
 ## 6. Email Automation (implementado)
+
+### Email automático al cliente
+- **LeadReceived**: Respuesta inmediata al enviar el formulario
+- Incluye CTA a Calendly si está configurado
+
+### Secuencia de follow-ups
+- **SendLeadFollowup** (job): +2, +5, +10 días
+- Contenido diferenciado por paso (recordatorio, tips, último CTA)
+- Desactivar: `LEAD_FOLLOWUP_EMAILS=false` en `.env`
 
 ### Webhook genérico
 - Variable `.env`: `LEAD_WEBHOOK_URL`
@@ -120,6 +130,8 @@ El portfolio se ha transformado en una **máquina de captación de leads** con:
 - **Desarrollo**: `php artisan queue:work` en otra terminal, o `QUEUE_CONNECTION=sync` en `.env` para ejecución inmediata
 - **Producción**: supervisor o similar para mantener el worker activo
 
+> Ver documentación completa: [AUTOMATIZACION_LEADS_IMPLEMENTADA.md](AUTOMATIZACION_LEADS_IMPLEMENTADA.md)
+
 ---
 
 ## 7. Guía de Marketing
@@ -135,19 +147,24 @@ Ver `docs/GUIA_MARKETING_LEADS.md` para:
 | Archivo | Cambio |
 |---------|--------|
 | `database/migrations/*_create_leads_table.php` | Nueva tabla |
-| `app/Models/Lead.php` | Modelo con scoring |
+| `app/Models/Lead.php` | Modelo con scoring, statusOptions(), pipeline |
 | `app/Services/LeadScoringService.php` | Cálculo de score |
-| `app/Services/LeadAutomationService.php` | Webhook + Brevo |
+| `app/Services/LeadAutomationService.php` | Webhook + Brevo + scheduleFollowups |
 | `app/Jobs/SyncLeadToEmailProvider.php` | Job asíncrono |
-| `config/lead_automation.php` | Configuración |
+| `app/Jobs/SendLeadFollowup.php` | Job follow-ups |
+| `app/Mail/LeadReceived.php` | Email automático al cliente |
+| `app/Mail/LeadFollowupMail.php` | Email follow-ups |
+| `config/lead_automation.php` | Configuración + followup_emails_enabled |
 | `resources/views/portfolio/components/problem.blade.php` | Nueva sección |
 | `resources/views/portfolio/components/case-studies.blade.php` | Nueva sección |
 | `resources/views/portfolio/components/offers.blade.php` | Nueva sección |
 | `resources/views/portfolio/components/calendly.blade.php` | Nueva sección |
-| `resources/views/components/⚡contact-form.blade.php` | Formulario de leads |
-| `app/Filament/Resources/Leads/*` | Recurso Filament |
+| `resources/views/components/⚡contact-form.blade.php` | Formulario + LeadReceived |
+| `app/Filament/Resources/Leads/*` | Recurso Filament + pipeline |
+| `app/Filament/Widgets/LeadsStatsWidget.php` | Dashboard stats |
+| `app/Filament/Widgets/LatestLeadsWidget.php` | Dashboard últimos leads |
 | `app/Filament/Pages/SiteSettings.php` | Campo Calendly URL |
-| `app/Providers/Filament/AdminPanelProvider.php` | `->profile()` |
-| `app/Services/PortfolioDataService.php` | calendlyUrl en contact |
+| `app/Http/Controllers/BlogController.php` | Página individual blog |
+| `app/Http/Controllers/SitemapController.php` | + URLs blog |
 | `app/View/Composers/PortfolioComposer.php` | Nav con nuevas secciones |
-| `.env.example` | LEAD_WEBHOOK_URL, BREVO_* |
+| `.env.example` | LEAD_WEBHOOK_URL, BREVO_*, LEAD_FOLLOWUP_EMAILS |
