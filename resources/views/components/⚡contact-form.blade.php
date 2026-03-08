@@ -9,6 +9,7 @@ use App\Models\Lead;
 use App\Models\SiteSetting;
 use App\Services\LeadEventService;
 use App\Services\LeadScoringService;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 
@@ -77,56 +78,78 @@ new class extends Component
 
     public function submit(): void
     {
-        $this->validate();
+        Log::info('[ContactForm] submit() called', ['email' => $this->email]);
 
-        $data = [
-            'name' => $this->name,
-            'email' => $this->email,
-            'project_type' => $this->project_type,
-            'what_to_automate' => $this->what_to_automate,
-            'budget_range' => $this->budget_range,
-            'urgency' => $this->urgency,
-            'message' => $this->message,
-        ];
+        try {
+            $this->validate();
+            Log::info('[ContactForm] validation passed');
 
-        $score = app(LeadScoringService::class)->calculateScore($data);
+            $data = [
+                'name' => $this->name,
+                'email' => $this->email,
+                'project_type' => $this->project_type,
+                'what_to_automate' => $this->what_to_automate,
+                'budget_range' => $this->budget_range,
+                'urgency' => $this->urgency,
+                'message' => $this->message,
+            ];
 
-        $lead = Lead::create([
-            ...$data,
-            'score' => $score,
-            'status' => Lead::STATUS_NUEVO,
-            'source' => Lead::SOURCE_CONTACT,
-            'utm_source' => $this->utm_source,
-            'utm_medium' => $this->utm_medium,
-            'utm_campaign' => $this->utm_campaign,
-        ]);
+            $score = app(LeadScoringService::class)->calculateScore($data);
+            Log::info('[ContactForm] score calculated', ['score' => $score]);
 
-        app(LeadEventService::class)->record($lead, \App\Models\LeadEvent::TYPE_LEAD_CREATED, ['score' => $score]);
+            $lead = Lead::create([
+                ...$data,
+                'score' => $score,
+                'status' => Lead::STATUS_NUEVO,
+                'source' => Lead::SOURCE_CONTACT,
+                'utm_source' => $this->utm_source,
+                'utm_medium' => $this->utm_medium,
+                'utm_campaign' => $this->utm_campaign,
+            ]);
+            Log::info('[ContactForm] lead created', ['lead_id' => $lead->id]);
 
-        // Also create contact message for admin notification (backward compatibility)
-        $contactMessage = ContactMessage::create([
-            'name' => $this->name,
-            'email' => $this->email,
-            'subject' => "Lead: {$this->project_type} (Score: {$score})",
-            'message' => "Project type: {$this->project_type}\nBudget: {$this->budget_range}\nUrgency: {$this->urgency}\nWhat to automate: {$this->what_to_automate}\n\nMessage: {$this->message}",
-        ]);
+            app(LeadEventService::class)->record($lead, \App\Models\LeadEvent::TYPE_LEAD_CREATED, ['score' => $score]);
 
-        $adminEmail = SiteSetting::get('contact_email');
-        if ($adminEmail) {
-            Mail::to($adminEmail)->send(new ContactMessageReceived($contactMessage));
+            // Also create contact message for admin notification (backward compatibility)
+            $contactMessage = ContactMessage::create([
+                'name' => $this->name,
+                'email' => $this->email,
+                'subject' => "Lead: {$this->project_type} (Score: {$score})",
+                'message' => "Project type: {$this->project_type}\nBudget: {$this->budget_range}\nUrgency: {$this->urgency}\nWhat to automate: {$this->what_to_automate}\n\nMessage: {$this->message}",
+            ]);
+            Log::info('[ContactForm] contact message created', ['message_id' => $contactMessage->id]);
+
+            $adminEmail = SiteSetting::get('contact_email');
+            if ($adminEmail) {
+                Mail::to($adminEmail)->send(new ContactMessageReceived($contactMessage));
+                Log::info('[ContactForm] admin email sent');
+            } else {
+                Log::warning('[ContactForm] no contact_email in SiteSetting, admin email skipped');
+            }
+
+            // Email automático al cliente: hot (score >= 10) → CTA directo Calendly; cold → LeadReceived
+            // Usamos send() en lugar de queue() para que funcione sin worker (Hostinger shared)
+            $mailable = $score >= 10
+                ? new HighIntentLeadReceived($lead)
+                : new LeadReceived($lead);
+            Mail::to($lead->email)->send($mailable);
+            Log::info('[ContactForm] client email sent');
+            app(LeadEventService::class)->record($lead, \App\Models\LeadEvent::TYPE_EMAIL_SENT, ['type' => $score >= 10 ? 'high_intent' : 'standard']);
+
+            SyncLeadToEmailProvider::dispatch($lead);
+
+            $this->reset(['name', 'email', 'project_type', 'what_to_automate', 'budget_range', 'urgency', 'message']);
+            $this->success = true;
+            Log::info('[ContactForm] submit completed successfully');
+        } catch (\Throwable $e) {
+            Log::error('[ContactForm] submit failed', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw $e;
         }
-
-        // Email automático al cliente: hot (score >= 10) → CTA directo Calendly; cold → LeadReceived
-        $mailable = $score >= 10
-            ? new HighIntentLeadReceived($lead)
-            : new LeadReceived($lead);
-        Mail::to($lead->email)->queue($mailable);
-        app(LeadEventService::class)->record($lead, \App\Models\LeadEvent::TYPE_EMAIL_SENT, ['type' => $score >= 10 ? 'high_intent' : 'standard']);
-
-        SyncLeadToEmailProvider::dispatch($lead);
-
-        $this->reset(['name', 'email', 'project_type', 'what_to_automate', 'budget_range', 'urgency', 'message']);
-        $this->success = true;
     }
 };
 ?>

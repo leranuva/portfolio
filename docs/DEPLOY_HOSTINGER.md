@@ -248,3 +248,9 @@ Los emails se envían en la misma petición (más lento pero funciona sin cron).
 - Si `storage:link` falla, crea manualmente la carpeta `public/storage` y copia el contenido de `storage/app/public` dentro
 - Comprueba que `APP_URL` en `.env` coincide con tu dominio (ej: `https://ramironuva.com`)
 - Revisa permisos 775 en `storage/` y `storage/app/public/`
+
+**No recibo emails del formulario de contacto**
+1. **Configura MAIL_*** en `.env`: MAIL_MAILER=smtp, MAIL_HOST, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD, MAIL_ENCRYPTION=ssl
+2. **Configura contact_email** en Admin → Settings (Filament). Es el email donde recibes las notificaciones.
+3. Si MAIL_MAILER=log (por defecto), los emails se guardan en `storage/logs/laravel.log` y no se envían.
+4. Revisa `storage/logs/laravel.log` para ver errores de envío.

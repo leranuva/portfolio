@@ -30,7 +30,7 @@ return [
     | Send automated follow-up emails at +2, +5, +10 days after lead creation.
     | Set LEAD_FOLLOWUP_EMAILS=false to disable.
     */
-    'followup_emails_enabled' => env('LEAD_FOLLOWUP_EMAILS', true),
+    'followup_emails_enabled' => filter_var(env('LEAD_FOLLOWUP_EMAILS', true), FILTER_VALIDATE_BOOLEAN),
 
     /*
     |--------------------------------------------------------------------------

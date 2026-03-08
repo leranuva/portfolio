@@ -39,6 +39,7 @@
     <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700&family=cormorant-garamond:400,500,600,700" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/css/portfolio.css', 'resources/js/app.js'])
+    @livewireStyles
 </head>
 <body class="bg-[#fafaf9] dark:bg-[#0c0c0f] text-zinc-800 dark:text-zinc-200 font-sans antialiased transition-colors duration-500">
     @include('portfolio.components.nav')
@@ -48,5 +49,6 @@
     </main>
 
     @stack('scripts')
+    @livewireScripts
 </body>
 </html>

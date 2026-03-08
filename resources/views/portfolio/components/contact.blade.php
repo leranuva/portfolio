@@ -14,7 +14,7 @@
             </p>
         </div>
 
-        @livewire('contact-form')
+        @include('portfolio.components.contact-form')
 
         <div class="mt-16 flex flex-wrap justify-center gap-8"
              x-data="{ visible: false }"
