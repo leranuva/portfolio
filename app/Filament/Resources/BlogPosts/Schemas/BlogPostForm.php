@@ -23,7 +23,7 @@ class BlogPostForm
                 Textarea::make('content')
                     ->columnSpanFull(),
                 FileUpload::make('image')
-                    ->disk('public')
+                    ->disk('blog')
                     ->directory('blog')
                     ->image()
                     ->visibility('public'),

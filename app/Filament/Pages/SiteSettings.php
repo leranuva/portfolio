@@ -127,7 +127,7 @@ class SiteSettings extends Page
                             ->schema([
                                 FileUpload::make('hero_image')
                                     ->label('Profile image')
-                                    ->disk('public')
+                                    ->disk('blog')
                                     ->directory('profile')
                                     ->image()
                                     ->avatar()
@@ -146,7 +146,7 @@ class SiteSettings extends Page
                                     ->maxLength(500),
                                 FileUpload::make('hero_cv_url')
                                     ->label('CV (PDF)')
-                                    ->disk('public')
+                                    ->disk('blog')
                                     ->directory('cv')
                                     ->acceptedFileTypes(['application/pdf'])
                                     ->maxSize(5120)

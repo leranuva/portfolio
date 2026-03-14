@@ -41,6 +41,11 @@ class BlogPost extends Model
             return null;
         }
 
-        return asset('storage/' . ltrim($this->image, '/'));
+        $path = ltrim($this->image, '/');
+        // blog disk saves to public/blog/, legacy used storage/app/public/blog/
+        if (file_exists(public_path($path))) {
+            return asset($path);
+        }
+        return asset('storage/' . $path);
     }
 }

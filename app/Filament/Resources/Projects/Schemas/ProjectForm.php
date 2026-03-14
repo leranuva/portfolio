@@ -27,7 +27,7 @@ class ProjectForm
                 FileUpload::make('image')
                     ->image()
                     ->directory('projects')
-                    ->disk('public'),
+                    ->disk('blog'),
                 Select::make('project_category_id')
                     ->relationship('category', 'name')
                     ->searchable()

@@ -18,12 +18,12 @@ class PortfolioDataService
     {
         $cvUrl = SiteSetting::get('hero_cv_url');
         if ($cvUrl && ! str_starts_with((string) $cvUrl, 'http')) {
-            $cvUrl = Storage::url($cvUrl);
+            $cvUrl = $this->publicFileUrl($cvUrl);
         }
 
         $image = SiteSetting::get('hero_image');
         if ($image && ! str_starts_with((string) $image, 'http')) {
-            $image = Storage::url($image);
+            $image = $this->publicFileUrl($image);
         }
 
         return [
@@ -87,7 +87,7 @@ class PortfolioDataService
     {
         $cvUrl = SiteSetting::get('hero_cv_url');
         if ($cvUrl && ! str_starts_with((string) $cvUrl, 'http')) {
-            $cvUrl = Storage::url($cvUrl);
+            $cvUrl = $this->publicFileUrl($cvUrl);
         }
 
         return [
@@ -97,5 +97,17 @@ class PortfolioDataService
             'cvUrl' => $cvUrl,
             'calendlyUrl' => SiteSetting::get('calendly_url'),
         ];
+    }
+
+    /**
+     * Resolve URL for files: public disk (blog/profile/cv) or legacy storage.
+     */
+    private function publicFileUrl(string $path): string
+    {
+        $path = ltrim($path, '/');
+        if (file_exists(public_path($path))) {
+            return asset($path);
+        }
+        return Storage::url($path);
     }
 }

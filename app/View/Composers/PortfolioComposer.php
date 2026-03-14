@@ -20,8 +20,11 @@ class PortfolioComposer
         $metaDescription = SiteSetting::get('meta_description') ?: $this->excerpt($subtitle ?: $aboutText ?: '', 160);
 
         $ogImage = null;
-        if ($heroImage) {
-            $ogImage = str_starts_with($heroImage, 'http') ? $heroImage : url(Storage::url($heroImage));
+        if ($heroImage && ! str_starts_with($heroImage, 'http')) {
+            $path = ltrim($heroImage, '/');
+            $ogImage = file_exists(public_path($path)) ? asset($path) : url(Storage::url($heroImage));
+        } elseif ($heroImage) {
+            $ogImage = $heroImage;
         }
 
         $calendlyUrl = SiteSetting::get('calendly_url');

@@ -47,8 +47,8 @@
                      :style="'animation-delay: ' + ({{ $index * 80 }}) + 'ms'"
                      @click="window.location.href = '{{ url('/projects/' . $project->slug) }}'">
                     <div class="relative overflow-hidden aspect-[4/3]">
-                        @if($project->image)
-                            <img src="{{ asset('storage/' . $project->image) }}"
+                        @if($project->image_url)
+                            <img src="{{ $project->image_url }}"
                                  alt="{{ $project->title }}"
                                  loading="lazy"
                                  decoding="async"

@@ -43,4 +43,16 @@ class Project extends Model
         return $query->whereNotNull('published_at')
             ->where('published_at', '<=', now());
     }
+
+    public function getImageUrlAttribute(): ?string
+    {
+        if (empty($this->image)) {
+            return null;
+        }
+        $path = ltrim($this->image, '/');
+        if (file_exists(public_path($path))) {
+            return asset($path);
+        }
+        return asset('storage/' . $path);
+    }
 }

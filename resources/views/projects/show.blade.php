@@ -8,9 +8,9 @@
 {{ \Illuminate\Support\Str::limit(strip_tags($project->description ?? ''), 160) }}
 @endsection
 
-@if($project->image)
+@if($project->image_url)
 @section('ogImage')
-    <meta property="og:image" content="{{ asset('storage/' . $project->image) }}">
+    <meta property="og:image" content="{{ $project->image_url }}">
 @endsection
 @endif
 
@@ -49,9 +49,9 @@
                             allowfullscreen
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
                 </div>
-            @elseif($project->image)
+            @elseif($project->image_url)
                 <div class="rounded-2xl overflow-hidden mb-12 shadow-lg">
-                    <img src="{{ asset('storage/' . $project->image) }}"
+                    <img src="{{ $project->image_url }}"
                          alt="{{ $project->title }}"
                          class="w-full h-auto object-cover">
                 </div>
