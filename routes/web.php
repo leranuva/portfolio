@@ -10,12 +10,15 @@ use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
-Route::post('/contact-form', ContactFormController::class)->name('contact.form.submit');
+Route::post('/contact-form', ContactFormController::class)->middleware('throttle:contact-submissions')->name('contact.form.submit');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 Route::get('/projects/{slug}', [ProjectController::class, 'show'])->name('projects.show');
 Route::view('/recursos/auditoria', 'pages.lead-magnet')->name('lead-magnet.auditoria');
 
-Route::post('/webhooks/calendly', CalendlyWebhookController::class)->name('webhooks.calendly')->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class);
+Route::post('/webhooks/calendly', CalendlyWebhookController::class)
+    ->middleware('throttle:calendly-webhooks')
+    ->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class)
+    ->name('webhooks.calendly');
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 Route::get('/robots.txt', fn () => response(
     "User-agent: *\nAllow: /\n\nSitemap: " . url('/sitemap.xml'),
@@ -23,4 +26,4 @@ Route::get('/robots.txt', fn () => response(
     ['Content-Type' => 'text/plain']
 ))->name('robots');
 
-Route::post('/contact', ContactController::class)->name('contact.store');
+Route::post('/contact', ContactController::class)->middleware('throttle:contact-submissions')->name('contact.store');

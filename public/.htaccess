@@ -1,9 +1,16 @@
+<FilesMatch "(?i)^(?:\.env(?:\..*)?|artisan|composer\.(?:json|lock)|.*\.(?:log|sqlite3?|sql))$">
+    Require all denied
+</FilesMatch>
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
     </IfModule>
 
     RewriteEngine On
+
+    # Allow ACME challenges while denying hidden files and directories.
+    RewriteRule (^|/)\.(?!well-known(?:/|$)) - [F,L]
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .

@@ -24,6 +24,9 @@ class SyncLeadToEmailProvider implements ShouldQueue
 
     public function handle(LeadAutomationService $service): void
     {
-        $service->sync($this->lead);
+        $lead = $this->lead->fresh();
+        if ($lead?->email_verified_at) {
+            $service->sync($lead);
+        }
     }
 }

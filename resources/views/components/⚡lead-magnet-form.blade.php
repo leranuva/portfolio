@@ -1,8 +1,12 @@
 <?php
 
 use App\Models\Lead;
+use App\Models\LeadEvent;
 use App\Services\LeadEventService;
-use Illuminate\Support\Facades\Mail;
+use App\Services\PublicSubmission;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\RateLimiter;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 
 new class extends Component
@@ -13,6 +17,7 @@ new class extends Component
 
     public bool $success = false;
 
+    #[Locked]
     public string $resourceSlug = '';
 
     public function mount(string $resourceSlug = 'auditoria'): void
@@ -23,37 +28,47 @@ new class extends Component
     protected function rules(): array
     {
         return [
-            'email' => ['required', 'email'],
+            'email' => PublicSubmission::emailRules(),
             'website' => ['nullable', 'string', 'max:255'],
         ];
     }
 
     public function submit(): void
     {
-        $this->validate();
+        if (! RateLimiter::attempt('lead-magnet:ip:'.request()->ip(), 5, fn () => true)
+            || ! RateLimiter::attempt('lead-magnet:global', 30, fn () => true)) {
+            $this->addError('email', 'Too many attempts. Please try again later.');
 
-        $lead = Lead::create([
-            'name' => explode('@', $this->email)[0],
-            'email' => $this->email,
-            'project_type' => 'Lead magnet: ' . $this->resourceSlug,
-            'what_to_automate' => null,
-            'budget_range' => 'medio',
-            'urgency' => 'flexible',
-            'message' => $this->website ? "Website: {$this->website}" : null,
-            'score' => 0,
-            'status' => Lead::STATUS_NUEVO,
-            'source' => Lead::SOURCE_LEAD_MAGNET,
-            'utm_source' => request()->query('utm_source') ?? session('utm_source'),
-            'utm_medium' => request()->query('utm_medium') ?? session('utm_medium'),
-            'utm_campaign' => request()->query('utm_campaign') ?? session('utm_campaign'),
-        ]);
+            return;
+        }
 
-        app(LeadEventService::class)->record($lead, \App\Models\LeadEvent::TYPE_LEAD_CREATED, [
-            'resource' => $this->resourceSlug,
-        ]);
+        $data = $this->validate();
+        if (! RateLimiter::attempt('lead-magnet:recipient:'.PublicSubmission::recipientKey($data['email']), 3, fn () => true, 3600)) {
+            $this->addError('email', 'Too many attempts. Please try again later.');
 
-        // TODO: Send lead magnet email with download link when Mail class exists
-        // Mail::to($lead->email)->queue(new LeadMagnetReceived($lead, $this->resourceSlug));
+            return;
+        }
+
+        PublicSubmission::once('lead-magnet', [...$data, 'resource' => $this->resourceSlug], function () use ($data): void {
+            DB::transaction(function () use ($data): void {
+                $lead = Lead::create([
+                    'name' => explode('@', $data['email'])[0],
+                    'email' => $data['email'],
+                    'project_type' => 'Lead magnet: '.$this->resourceSlug,
+                    'budget_range' => 'medio',
+                    'urgency' => 'flexible',
+                    'message' => filled($data['website']) ? 'Website: '.$data['website'] : null,
+                    'score' => 0,
+                    'status' => Lead::STATUS_NUEVO,
+                    'source' => Lead::SOURCE_LEAD_MAGNET,
+                    ...PublicSubmission::tracking(session()->only(PublicSubmission::TRACKING_FIELDS)),
+                ]);
+
+                app(LeadEventService::class)->record($lead, LeadEvent::TYPE_LEAD_CREATED, [
+                    'resource' => $this->resourceSlug,
+                ]);
+            });
+        });
 
         $this->reset(['email', 'website']);
         $this->success = true;
@@ -64,8 +79,7 @@ new class extends Component
 <div>
     @if($success)
         <div class="p-6 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/40 text-emerald-800 dark:text-emerald-200 text-center">
-            <p class="font-medium">Check your inbox!</p>
-            <p class="text-sm mt-1 opacity-90">We've sent you the resource.</p>
+            <p class="font-medium">Request received.</p>
         </div>
     @else
         <form wire:submit="submit" class="space-y-4">
@@ -91,7 +105,7 @@ new class extends Component
             <button type="submit"
                     wire:loading.attr="disabled"
                     class="w-full px-8 py-4 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] disabled:opacity-60 text-white font-semibold rounded-xl transition-colors">
-                <span wire:loading.remove wire:target="submit">Get the resource</span>
+                <span wire:loading.remove wire:target="submit">Request the resource</span>
                 <span wire:loading wire:target="submit">Sending...</span>
             </button>
         </form>

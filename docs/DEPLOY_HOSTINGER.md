@@ -30,9 +30,9 @@ Esto crea la carpeta `hostinger-deploy/` con:
 
 ## Paso 2: Estructura en Hostinger
 
-Hostinger usa `public_html` como raíz web. Tienes dos opciones:
+El document root del dominio debe apuntar exclusivamente al directorio `public/` de Laravel.
 
-### Opción A: Cambiar Document Root (recomendado)
+### Cambiar Document Root
 
 1. En hPanel → **Dominios** → tu dominio → **Configuración avanzada**
 2. Cambia **Document Root** a: `public_html/portfolio/public`
@@ -61,30 +61,14 @@ public_html/
     composer.json
 ```
 
-### Opción B: Todo en public_html (sin cambiar Document Root)
-
-Si no puedes cambiar el Document Root:
-
-1. Sube el contenido de `hostinger-deploy/public/` a `public_html/`
-2. Sube el resto (app, bootstrap, config, etc.) a `public_html/` también
-3. Edita `public_html/index.php` y cambia las rutas:
-
-```php
-// Antes:
-require __DIR__.'/../vendor/autoload.php';
-$app = require_once __DIR__.'/../bootstrap/app.php';
-
-// Después:
-require __DIR__.'/vendor/autoload.php';
-$app = require_once __DIR__.'/bootstrap/app.php';
-```
+Si tu plan fija `public_html` como document root, conserva el proyecto y el `.env` fuera de ese directorio. Coloca en `public_html` solo el contenido de `public/` y ajusta `index.php` para que las rutas de mantenimiento, autoload y bootstrap apunten al proyecto privado. Comprueba que ningún dominio adicional sirve ese directorio privado.
 
 ---
 
 ## Paso 3: Subir archivos con File Manager
 
 1. Entra a **hPanel** → **Archivos** → **Administrador de archivos**
-2. Navega a `public_html/portfolio/` (o `public_html/` si usas Opción B)
+2. Navega al directorio del proyecto fuera del alcance HTTP
 3. Crea las carpetas si no existen
 4. **Subir carpeta por carpeta**: selecciona la carpeta local, arrastra o usa "Subir archivos"
    - Hostinger permite subir múltiples archivos; para carpetas, sube el contenido de cada una
@@ -115,6 +99,9 @@ APP_ENV=production
 APP_KEY=                    # Se genera en el paso 6
 APP_DEBUG=false
 APP_URL=https://tudominio.com
+ADMIN_EMAILS=administrador@tudominio.com
+SESSION_SECURE_COOKIE=true
+CACHE_STORE=database
 
 # MySQL (datos en hPanel → Bases de datos)
 DB_CONNECTION=mysql
@@ -123,14 +110,20 @@ DB_DATABASE=u123456789_portfolio
 DB_USERNAME=u123456789_portfolio
 DB_PASSWORD=tu_password
 
-# Mail (hPanel → Correo electrónico)
+# SMTP opcional para notificaciones internas
+CONTACT_NOTIFY_ADMIN=false
 MAIL_MAILER=smtp
+MAIL_SCHEME=smtps
 MAIL_HOST=smtp.hostinger.com
 MAIL_PORT=465
 MAIL_USERNAME=tu_email@tudominio.com
 MAIL_PASSWORD=tu_password
-MAIL_ENCRYPTION=ssl
 MAIL_FROM_ADDRESS="noreply@tudominio.com"
+
+TURNSTILE_SITE_KEY=
+TURNSTILE_SECRET_KEY=
+CALENDLY_WEBHOOK_SIGNING_KEY=
+LEAD_FOLLOWUP_EMAILS=false
 ```
 
 ---
@@ -152,7 +145,6 @@ Hostinger incluye **Terminal** en el panel. Entra y ejecuta:
 cd ~/public_html/portfolio
 # o cd ~/domains/tudominio.com/public_html/portfolio
 
-php artisan key:generate
 php artisan migrate --force
 php artisan storage:link
 php artisan config:cache
@@ -160,13 +152,13 @@ php artisan route:cache
 php artisan view:cache
 ```
 
-Si no tienes Terminal, genera la key localmente y añádela al .env:
+En una instalación nueva, genera `APP_KEY` antes de ejecutar los comandos. En una actualización conserva la clave existente. Si la clave estuvo expuesta, planifica su rotación e identifica los datos cifrados que deban migrarse antes de cambiarla.
 
 ```bash
 php artisan key:generate --show
 ```
 
-Copia el resultado y pégalo en `APP_KEY=` del `.env`.
+Copia el resultado y pégalo en `APP_KEY=` del `.env` privado. Comprueba que el usuario administrador existe y que su email aparece en `ADMIN_EMAILS`. Para crear uno nuevo usa `php artisan make:filament-user` con una contraseña única. Revisa y deshabilita las cuentas de prueba anteriores.
 
 ---
 
@@ -176,40 +168,15 @@ En File Manager, permisos recomendados:
 
 | Carpeta | Permisos |
 |---------|----------|
-| `storage/` | 775 (recursivo) |
-| `bootstrap/cache/` | 775 |
-
-Clic derecho → Permisos → 775 (rwxrwxr-x).
+| `storage/` | Escritura solo para el usuario de PHP o su grupo de aplicación |
+| `bootstrap/cache/` | Escritura solo para el usuario de PHP o su grupo de aplicación |
+| `.env` | Lectura para el propietario y, si es necesario, el grupo de aplicación |
 
 ---
 
-## Paso 8: Cola de jobs (emails, follow-ups)
+## Paso 8: Recuperación del correo y verificación
 
-Los emails y follow-ups usan la cola. En Hostinger shared no hay worker permanente, pero puedes:
-
-**Opción 1 – Cron (recomendado)**
-
-En hPanel → **Cron Jobs**, añade:
-
-```
-* * * * * cd /home/u123456789/domains/tudominio.com/public_html/portfolio && php artisan schedule:run >> /dev/null 2>&1
-```
-
-Y en `app/Console/Kernel.php` (o `routes/console.php` en Laravel 11):
-
-```php
-Schedule::command('queue:work --stop-when-empty')->everyMinute();
-```
-
-**Opción 2 – Sin cola**
-
-En `.env`:
-
-```
-QUEUE_CONNECTION=sync
-```
-
-Los emails se envían en la misma petición (más lento pero funciona sin cron).
+Sigue el [plan de seguridad](PLAN_SEGURIDAD.md) para preservar los registros, pausar workers anteriores, desplegar las migraciones y verificar el formulario antes de reactivar SMTP. La captura funciona con el envío deshabilitado. Habilita `CONTACT_NOTIFY_ADMIN=true` solo para notificaciones internas y después de comprobar el destinatario configurado en el panel.
 
 ---
 
@@ -232,7 +199,7 @@ Los emails se envían en la misma petición (más lento pero funciona sin cron).
 - Revisa `storage/logs/laravel.log`
 
 **Página en blanco**
-- `APP_DEBUG=true` temporalmente para ver el error
+- Mantén `APP_DEBUG=false` en el dominio público y consulta los registros privados
 - Comprueba que `APP_KEY` está definido
 
 **CSS/JS no cargan**
@@ -250,7 +217,7 @@ Los emails se envían en la misma petición (más lento pero funciona sin cron).
 - Revisa permisos 775 en `storage/` y `storage/app/public/`
 
 **No recibo emails del formulario de contacto**
-1. **Configura MAIL_*** en `.env`: MAIL_MAILER=smtp, MAIL_HOST, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD, MAIL_ENCRYPTION=ssl
+1. Comprueba `CONTACT_NOTIFY_ADMIN` y configura SMTP en el `.env` privado. Para el puerto 465 usa `MAIL_SCHEME=smtps`.
 2. **Configura contact_email** en Admin → Settings (Filament). Es el email donde recibes las notificaciones.
 3. Si MAIL_MAILER=log (por defecto), los emails se guardan en `storage/logs/laravel.log` y no se envían.
 4. Revisa `storage/logs/laravel.log` para ver errores de envío.

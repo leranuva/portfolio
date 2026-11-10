@@ -14,5 +14,5 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->dontFlash(['cf-turnstile-response', 'company_website']);
     })->create();

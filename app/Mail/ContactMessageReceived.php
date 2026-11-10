@@ -20,15 +20,15 @@ class ContactMessageReceived extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'New contact message: ' . ($this->message->subject ?: 'No subject'),
-            replyTo: [$this->message->email],
+            subject: 'New portfolio contact message',
         );
     }
 
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.contact-message-received',
+            view: 'emails.contact-message-received',
+            with: ['adminUrl' => rtrim(config('app.url'), '/').'/admin/contact-messages'],
         );
     }
 

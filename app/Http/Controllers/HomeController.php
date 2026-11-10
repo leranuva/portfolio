@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Services\PortfolioDataService;
+use App\Services\PublicSubmission;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class HomeController extends Controller
@@ -11,8 +13,11 @@ class HomeController extends Controller
         private readonly PortfolioDataService $portfolioData
     ) {}
 
-    public function __invoke(): View
+    public function __invoke(Request $request): View
     {
+        $tracking = PublicSubmission::tracking($request->query());
+        $request->session()->put($tracking);
+
         return view('pages.home', [
             'hero' => $this->portfolioData->getHeroData(),
             'about' => $this->portfolioData->getAboutData(),
@@ -22,6 +27,7 @@ class HomeController extends Controller
             'categories' => $this->portfolioData->getProjectCategories(),
             'blogPosts' => $this->portfolioData->getBlogPosts(),
             'contact' => $this->portfolioData->getContactData(),
+            'contactTracking' => PublicSubmission::tracking($request->session()->only(PublicSubmission::TRACKING_FIELDS)),
         ]);
     }
 }

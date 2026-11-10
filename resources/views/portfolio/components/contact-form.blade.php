@@ -1,12 +1,3 @@
-@php
-if (request()->hasAny(['utm_source', 'utm_medium', 'utm_campaign'])) {
-    session([
-        'utm_source' => request()->query('utm_source'),
-        'utm_medium' => request()->query('utm_medium'),
-        'utm_campaign' => request()->query('utm_campaign'),
-    ]);
-}
-@endphp
 @if(session('contact_success'))
     <div class="p-6 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/40 text-emerald-800 dark:text-emerald-200 text-center">
         <p class="font-medium">Request received successfully.</p>
@@ -21,9 +12,13 @@ if (request()->hasAny(['utm_source', 'utm_medium', 'utm_campaign'])) {
 @if(!session('contact_success'))
     <form method="POST" action="{{ route('contact.form.submit') }}" class="space-y-6">
         @csrf
-        <input type="hidden" name="utm_source" value="{{ request()->query('utm_source') ?? session('utm_source') }}">
-        <input type="hidden" name="utm_medium" value="{{ request()->query('utm_medium') ?? session('utm_medium') }}">
-        <input type="hidden" name="utm_campaign" value="{{ request()->query('utm_campaign') ?? session('utm_campaign') }}">
+        @foreach($contactTracking as $field => $value)
+            <input type="hidden" name="{{ $field }}" value="{{ $value }}">
+        @endforeach
+        <div hidden>
+            <label for="contact-company-website">Leave this field empty</label>
+            <input type="text" id="contact-company-website" name="company_website" tabindex="-1" autocomplete="off">
+        </div>
 
         <div>
             <label for="contact-name" class="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">Name</label>
@@ -102,6 +97,15 @@ if (request()->hasAny(['utm_source', 'utm_medium', 'utm_campaign'])) {
             @enderror
         </div>
 
+        @if(config('contact.turnstile.enabled'))
+            <div class="cf-turnstile" data-sitekey="{{ config('contact.turnstile.site_key') }}" data-action="{{ \App\Rules\TurnstileToken::ACTION }}"></div>
+            @error('cf-turnstile-response')
+                <p class="text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+            @enderror
+            @pushOnce('scripts')
+                <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+            @endPushOnce
+        @endif
         <button type="submit"
                 class="w-full px-8 py-4 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-semibold rounded-xl shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900 transition-all duration-300">
             Send request

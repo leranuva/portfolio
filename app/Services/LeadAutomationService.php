@@ -20,7 +20,7 @@ class LeadAutomationService
 
     protected function scheduleFollowups(Lead $lead): void
     {
-        if (! config('lead_automation.followup_emails_enabled', true)) {
+        if (! config('lead_automation.followup_emails_enabled') || config('queue.default') === 'sync') {
             return;
         }
 

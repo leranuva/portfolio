@@ -23,7 +23,12 @@ class SendLeadFollowup implements ShouldQueue
 
     public function handle(LeadEventService $eventService): void
     {
-        Mail::to($this->lead->email)->send(new LeadFollowupMail($this->lead, $this->step));
-        $eventService->record($this->lead, LeadEvent::TYPE_FOLLOWUP_SENT, ['step' => $this->step]);
+        $lead = $this->lead->fresh();
+        if (! config('lead_automation.followup_emails_enabled') || ! $lead?->email_verified_at) {
+            return;
+        }
+
+        Mail::to($lead->email)->send(new LeadFollowupMail($lead, $this->step));
+        $eventService->record($lead, LeadEvent::TYPE_FOLLOWUP_SENT, ['step' => $this->step]);
     }
 }

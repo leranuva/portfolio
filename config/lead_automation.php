@@ -30,14 +30,14 @@ return [
     | Send automated follow-up emails at +2, +5, +10 days after lead creation.
     | Set LEAD_FOLLOWUP_EMAILS=false to disable.
     */
-    'followup_emails_enabled' => filter_var(env('LEAD_FOLLOWUP_EMAILS', true), FILTER_VALIDATE_BOOLEAN),
+    'followup_emails_enabled' => filter_var(env('LEAD_FOLLOWUP_EMAILS', false), FILTER_VALIDATE_BOOLEAN),
 
     /*
     |--------------------------------------------------------------------------
     | Calendly Integration
     |--------------------------------------------------------------------------
-    | API token for fetching invitee details when webhook payload lacks email.
+    | Signing key for verifying incoming webhook requests.
     | Webhook URL: POST /webhooks/calendly
     */
-    'calendly_api_token' => env('CALENDLY_API_TOKEN'),
+    'calendly_webhook_signing_key' => env('CALENDLY_WEBHOOK_SIGNING_KEY'),
 ];

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Services\PublicSubmission;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ContactFormRequest extends FormRequest
@@ -15,7 +16,7 @@ class ContactFormRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email'],
+            'email' => PublicSubmission::emailRules(),
             'subject' => ['nullable', 'string', 'max:255'],
             'message' => ['required', 'string', 'max:5000'],
         ];
